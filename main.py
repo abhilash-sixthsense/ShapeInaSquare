@@ -4,7 +4,7 @@ print("hi")
 class Shape:
     fill_char = "1"
     empty_char = "0"
-
+    history = []
     arr = []
 
     def __init__(self, arr):
@@ -32,14 +32,36 @@ class Shape:
             msg += "\n"
         return msg
 
+    def print(self):
+        print(self)
+
+    @staticmethod
+    def add_history(f):
+        def decorator(self):
+            self.history.append(self.arr)
+            return f(self)
+
+        return decorator
+
+    def revert(self):
+        if self.history:
+            print("Before Pop", self.history)
+            self.arr = self.history.pop()
+            print("After Pop", self.history)
+            return True
+        return False
+
+    @add_history
     def rotate_right(self):
         self.arr = list(zip(*self.arr[::-1]))
 
+    @add_history
     def rotate_left(self):
         # Not the best way, use this till an optinmal solution is found
         for _ in range(0, 3):
-            self.rotate_right()
+            self.arr = list(zip(*self.arr[::-1]))
 
+    @add_history
     def add_below(self, shape_1: "Shape"):
         pass
 
@@ -51,3 +73,6 @@ print(s1)
 
 s1.rotate_left()
 print(s1)
+s1.revert()
+print(s1)
+s1.print()
