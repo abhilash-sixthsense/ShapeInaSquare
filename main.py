@@ -9,17 +9,19 @@ class Shape:
 
     def __init__(self, arr):
         def convert_to_matrix():
+            # Clone a new copy to avoid giving an array reference outside.
+            new_arr = [row[:] for row in arr]
             max_cols = 0
-            for row in arr:
+            for row in new_arr:
                 if len(row) > max_cols:
                     max_cols = len(row)
 
-            print(f"Matrix size is {len(arr)},{max_cols}")
+            print(f"Matrix size is {len(new_arr)},{max_cols}")
 
-            for row in arr:
+            for row in new_arr:
                 for _ in range(0, max_cols - len(row)):
                     row.append(self.empty_char)
-            self.arr = arr
+            self.arr = new_arr
 
         convert_to_matrix()
         print(len(arr))
@@ -38,7 +40,8 @@ class Shape:
     @staticmethod
     def add_history(f):
         def decorator(self):
-            self.history.append(self.arr)
+            new_arr = [row[:] for row in self.arr]
+            self.history.append(new_arr)
             return f(self)
 
         return decorator
@@ -63,7 +66,8 @@ class Shape:
 
     @add_history
     def add_below(self, shape_1: "Shape"):
-        pass
+        for row in shape_1.arr:
+            self.arr.append(row)
 
 
 s1 = Shape([[1, 1, 1, 1], [1, 1]])
@@ -76,3 +80,5 @@ print(s1)
 s1.revert()
 print(s1)
 s1.print()
+
+s2 = Shape(s1.arr)
