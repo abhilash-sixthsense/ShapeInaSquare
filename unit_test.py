@@ -12,6 +12,8 @@ class TestShape(unittest.TestCase):
         for i, row1 in enumerate(matrix1):
             for j, element1 in enumerate(row1):
                 if element1 != matrix2[i][j]:
+                    Shape(matrix1).print()
+                    Shape(matrix2).print()
                     return False
 
         return True
@@ -19,7 +21,7 @@ class TestShape(unittest.TestCase):
     def test_convert_to_matrix(self):
         arr = [[1, 1, 1, 1], [1, 1]]
         s: Shape = Shape(arr)
-        expected_arr = [[1, 1, 1, 1], [1, 1, " ", " "]]
+        expected_arr = [[1, 1, 1, 1], [1, 1, 0, 0]]
         self.assertTrue(
             self.are_matrices_equal(s.arr, expected_arr),
             "Error in convert matrix function",
@@ -53,6 +55,27 @@ class TestShape(unittest.TestCase):
         cln_arr = s.clone_arr()
         self.assertFalse(s == cln_arr)
         self.assertTrue(self.are_matrices_equal(s.arr, cln_arr))
+
+    def test_flips(self):
+        s = Shape([[1], [1], [1, 1, 1]])
+        shapes = s.flips()
+        self.assertEqual(len(shapes), 4)
+        self.assertTrue(
+            self.are_matrices_equal(shapes[0].arr, [[1, 0, 0], [1, 0, 0], [1, 1, 1]])
+        )
+        self.assertTrue(
+            self.are_matrices_equal(shapes[1].arr, [[0, 0, 1], [0, 0, 1], [1, 1, 1]])
+        )
+        self.assertTrue(
+            self.are_matrices_equal(shapes[2].arr, [[1, 1, 1], [1, 0, 0], [1, 0, 0]])
+        )
+        self.assertTrue(
+            self.are_matrices_equal(shapes[3].arr, [[1, 1, 1], [0, 0, 1], [0, 0, 1]])
+        )
+        s.print()
+
+    def test_rotations(self):
+        pass
 
     # def test_upper(self):
     #     self.assertEqual("foo".upper(), "FOO")

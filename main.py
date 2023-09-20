@@ -1,13 +1,10 @@
-print("hi")
-
-
 class Shape:
     fill_char = "1"
     empty_char = "0"
     history = []
     arr = []
 
-    def __init__(self, arr, empty_char=" ", fill_char="1"):
+    def __init__(self, arr, empty_char=0, fill_char=1):
         def convert_to_matrix():
             # Clone a new copy to avoid giving an array reference outside.
             new_arr = [row[:] for row in arr]
@@ -16,7 +13,7 @@ class Shape:
                 if len(row) > max_cols:
                     max_cols = len(row)
 
-            print(f"Matrix size is {len(new_arr)},{max_cols}")
+            # print(f"Matrix size is {len(new_arr)},{max_cols}")
 
             for row in new_arr:
                 for _ in range(0, max_cols - len(row)):
@@ -28,7 +25,7 @@ class Shape:
         self.empty_char = empty_char
         self.fill_char = fill_char
         convert_to_matrix()
-        print(len(arr))
+        # print(len(arr))
 
     def __str__(self) -> str:
         msg = ""
@@ -46,6 +43,55 @@ class Shape:
 
     def clone_arr(self):
         return [row[:] for row in self.arr]
+
+    def clone(self):
+        return Shape(self.clone_arr)
+
+    def flips(self):
+        # Vertical, horizontal, vertical-horizontal filips
+        def horizontal_flip_matrix(matrix):
+            flipped_matrix = []
+            for row in matrix:
+                flipped_row = row[::-1]  # Reverse the order of elements in the row
+                flipped_matrix.append(flipped_row)
+            return flipped_matrix
+
+        def vertical_flip_matrix(matrix):
+            flipped_matrix = matrix[::-1]  # Reverse the order of rows in the matrix
+            return flipped_matrix
+
+        arr = self.clone_arr()
+        hf_arr = horizontal_flip_matrix(arr)
+        vf_arr = vertical_flip_matrix(arr)
+        hvf_arr = vertical_flip_matrix(hf_arr)
+
+        return [
+            Shape(arr),
+            Shape(hf_arr),
+            Shape(vf_arr),
+            Shape(hvf_arr),
+        ]
+
+    def rotations(self):
+        def rotate_matrix_90_clockwise(matrix):
+            if not matrix:
+                return []
+
+            num_rows, num_cols = len(matrix), len(matrix[0])
+            rotated_matrix = [[0] * num_rows for _ in range(num_cols)]
+
+            for i in range(num_rows):
+                for j in range(num_cols):
+                    rotated_matrix[j][num_rows - i - 1] = matrix[i][j]
+
+            return rotated_matrix
+
+        # All 90 degree rotations, total 4
+        arr = self.clone_arr()
+        arr_90 = rotate_matrix_90_clockwise(arr)
+        arr_180 = rotate_matrix_90_clockwise(arr_90)
+        arr_270 = rotate_matrix_90_clockwise(arr_180)
+        return [Shape(arr), Shape(arr_90), Shape(arr_180), Shape(arr_270)]
 
     @staticmethod
     def add_history(f):
