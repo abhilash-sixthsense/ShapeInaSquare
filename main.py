@@ -121,6 +121,10 @@ class Board:
         shape_size = shape.size()
         return shape_size[0] > self.size[0] or shape_size[1] > self.size[1]
 
+    @staticmethod
+    def __horizontal_flip(arr):
+        pass
+
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
         print(
             f"Inside __try_combinations shape {shape} , list : {remaining_shapes_list}"
@@ -181,8 +185,9 @@ class Board:
             print("No solved combinations")
 
 
-b = Board()
-b.solve()
+if __name__ == "__main__":
+    b = Board()
+    b.solve()
 # s1 = Shape([[1, 1, 1, 1], [1, 1]])
 # print(s1)
 # s2 = Shape(s1.arr)
