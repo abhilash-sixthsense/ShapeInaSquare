@@ -35,6 +35,16 @@ class Shape:
             msg += "\n"
         return msg
 
+    def empty_fill(self, no_of_empty_chars, before=False):
+        s = self.clone()
+        for row in s.arr:
+            for _ in range(no_of_empty_chars):
+                if before:
+                    row.insert(0, s.empty_char)
+                else:
+                    row.append(s.empty_char)
+        return s
+
     def print(self, prefix="\n"):
         print(prefix)
         print(self)
@@ -46,7 +56,7 @@ class Shape:
         return [row[:] for row in self.arr]
 
     def clone(self):
-        return Shape(self.clone_arr)
+        return Shape(self.clone_arr())
 
     def flips(self):
         # Vertical, horizontal, vertical-horizontal filips
@@ -125,9 +135,45 @@ class Shape:
 
     @add_history
     def add_below(self, shape_1: "Shape"):
-        for row in shape_1.arr:
-            self.arr.append(row)
-        self.print()
+        def simple_add_below(s1, s2):
+            s1 = s1.clone()
+            for row in s2.arr:
+                s1.arr.append(row)
+            return s1
+
+        arr = []
+        arr.append(simple_add_below(self, shape_1))
+
+        for i in range(1, len(self.arr[0])):  # loop thru the number of columns
+            arr.append(simple_add_below(self, shape_1.empty_fill(i, True)))
+
+        for i in range(1, len(shape_1.arr[0])):  # loop thru the number of columns
+            arr.append(simple_add_below(self.empty_fill(i, True), shape_1))
+
+        # TODO add below needn't be exactly the row below, row can be merged if the shapes fit in
+
+        """
+        eg 
+        1 0 0
+        1 0 0
+        1 0 0
+        
+        ++++++++
+        0 1 1
+        1 0 0
+        1 0 0
+        
+        could be 
+        
+        1 0 0
+        1 0 0
+        1 1 1
+        1 0 0
+        1 0 0
+        
+        """
+
+        return arr
 
     def add_above(self, shape_1: "Shape"):
         pass

@@ -97,6 +97,13 @@ class TestShape(unittest.TestCase):
             self.are_matrices_equal(shapes[3].arr, [[0, 0, 1], [0, 0, 1], [1, 1, 1]])
         )
 
+    def test_add_below(self):
+        s = Shape([[1], [1], [1, 1, 1]])
+        s1 = Shape([[1], [1], [1, 1, 1]])
+        # print(s.add_below(s1))
+        for shape in s.add_below(s1):
+            shape.print()
+
     # def test_upper(self):
     #     self.assertEqual("foo".upper(), "FOO")
 
