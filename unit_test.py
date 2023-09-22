@@ -12,6 +12,8 @@ class TestShape(unittest.TestCase):
         for i, row1 in enumerate(matrix1):
             for j, element1 in enumerate(row1):
                 if element1 != matrix2[i][j]:
+                    print("\n")
+                    print("Below matrixes are not equal")
                     Shape(matrix1).print()
                     Shape(matrix2).print()
                     return False
@@ -41,7 +43,7 @@ class TestShape(unittest.TestCase):
             ],
             empty_char=0,
         )
-        print(s.arr)
+        # print(s.arr)
         self.assertTrue(
             self.are_matrices_equal(
                 s.arr,
@@ -72,10 +74,28 @@ class TestShape(unittest.TestCase):
         self.assertTrue(
             self.are_matrices_equal(shapes[3].arr, [[1, 1, 1], [0, 0, 1], [0, 0, 1]])
         )
-        s.print()
+        # s.print()
 
     def test_rotations(self):
-        pass
+        s = Shape([[1], [1], [1, 1, 1]])
+        shapes = s.rotations()
+        self.assertEqual(len(shapes), 4)
+
+        self.assertTrue(
+            self.are_matrices_equal(shapes[0].arr, [[1, 0, 0], [1, 0, 0], [1, 1, 1]])
+        )
+        # shapes[1].print()
+        self.assertTrue(
+            self.are_matrices_equal(shapes[1].arr, [[1, 1, 1], [1, 0, 0], [1, 0, 0]])
+        )
+
+        self.assertTrue(
+            self.are_matrices_equal(shapes[2].arr, [[1, 1, 1], [0, 0, 1], [0, 0, 1]])
+        )
+
+        self.assertTrue(
+            self.are_matrices_equal(shapes[3].arr, [[0, 0, 1], [0, 0, 1], [1, 1, 1]])
+        )
 
     # def test_upper(self):
     #     self.assertEqual("foo".upper(), "FOO")

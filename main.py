@@ -35,7 +35,8 @@ class Shape:
             msg += "\n"
         return msg
 
-    def print(self):
+    def print(self, prefix="\n"):
+        print(prefix)
         print(self)
 
     def size(self):
