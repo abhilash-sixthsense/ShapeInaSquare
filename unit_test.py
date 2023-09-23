@@ -59,7 +59,10 @@ class TestShape(unittest.TestCase):
         self.assertTrue(self.are_matrices_equal(s.arr, cln_arr))
 
     def test_flips(self):
-        s = Shape([[1], [1], [1, 1, 1]])
+        s = Shape(
+            [[1], [1], [1, 1, 1]],
+            empty_char=0,
+        )
         shapes = s.flips()
         self.assertEqual(len(shapes), 4)
         self.assertTrue(
@@ -98,8 +101,8 @@ class TestShape(unittest.TestCase):
         )
 
     def test_add_below(self):
-        s = Shape([[1], [1], [1, 1, 1]])
-        s1 = Shape([[1], [1], [1, 1, 1]])
+        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
         # print(s.add_below(s1))
         for shape in s.add_below(s1):
             shape.print()

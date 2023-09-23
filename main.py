@@ -1,10 +1,10 @@
 class Shape:
-    fill_char = "1"
+    available_fill_chars = [i for i in range(1, 100)]
     empty_char = "0"
     history = []
     arr = []
 
-    def __init__(self, arr, empty_char=0, fill_char=1):
+    def __init__(self, arr, empty_char=0, unique_fill_char=False):
         def convert_to_matrix():
             # Clone a new copy to avoid giving an array reference outside.
             new_arr = [row[:] for row in arr]
@@ -23,8 +23,20 @@ class Shape:
         if not arr:
             raise BaseException("Passed array couldn't be null or empty")
         self.empty_char = empty_char
-        self.fill_char = fill_char
+        if unique_fill_char:
+            self.fill_char = Shape.available_fill_chars.pop(0)
+        else:
+            self.fill_char = 1
+
+        # print(
+        #     f"Fill Char is {self.fill_char} , remaining fill chars {Shape.available_fill_chars}"
+        # )
         convert_to_matrix()
+        for row in self.arr:
+            for i in range(0, len(row)):
+                if row[i] != self.empty_char:
+                    # print("freplaced")
+                    row[i] = self.fill_char
         # print(len(arr))
 
     def __str__(self) -> str:
@@ -46,8 +58,27 @@ class Shape:
         return s
 
     def print(self, prefix="\n"):
+        from colorama import Fore, Back, Style
+
+        colors = [
+            Fore.BLUE,
+            Fore.CYAN,
+            Fore.GREEN,
+            Fore.LIGHTBLUE_EX,
+            Fore.LIGHTGREEN_EX,
+            Fore.LIGHTMAGENTA_EX,
+            Fore.LIGHTRED_EX,
+            Fore.LIGHTRED_EX,
+        ]
         print(prefix)
-        print(self)
+        msg = ""
+
+        for row in self.arr:
+            for col in row:
+                msg += colors[col % 8]
+                msg += f" {col} "
+            msg += "\n"
+        print(msg)
 
     def size(self):
         return (len(self.arr), len(self.arr[0]))
