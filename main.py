@@ -3,7 +3,8 @@ from typing import List
 
 
 class Shape:
-    available_fill_chars = [i for i in range(1, 100)]
+    instace_count = 0
+    available_fill_chars = list(range(1, 100))
     empty_char = "0"
     history = []
     arr = []
@@ -43,6 +44,7 @@ class Shape:
                         # print("freplaced")
                         row[i] = self.fill_char
         # print(len(arr))
+        Shape.instace_count += 1
 
     def __str__(self) -> str:
         msg = ""
@@ -64,6 +66,7 @@ class Shape:
 
     def print(self, prefix="\n"):
         colors = [
+            Fore.BLACK,
             Fore.BLUE,
             Fore.CYAN,
             Fore.GREEN,
@@ -79,7 +82,7 @@ class Shape:
         for row in self.arr:
             for col in row:
                 msg += colors[col % 8]
-                msg += f" {col} "
+                msg += f" {col:3} "
             msg += "\n"
         print(msg)
         print(Style.RESET_ALL)
@@ -227,8 +230,11 @@ class Shape:
                     else:
                         print("Wrong condition")
                         raise Exception("Wrong condition in the logic")
+                # if the second array has larger number of colums , append the remaining ones
+                for k in range(min_col_len, len(row2)):
+                    row1.append(row2[k])
 
-            for k in range(i, len(cln_2)):
+            for k in range(i + 1, len(cln_2)):
                 row = cln_2[k]
                 cln_1.append(row)
             merged_shapes.append(Shape(cln_1))
@@ -239,48 +245,28 @@ class Shape:
 
     @add_history
     def add_below(self, shape_1: "Shape"):
-        def simple_add_below(s1, s2):
-            s1 = s1.clone()
+        def simple_add_below(s1: "Shape", s2: "Shape"):
+            arr = s1.clone_arr()
             for row in s2.arr:
-                s1.arr.append(row)
-            return s1
+                arr.append(row)
+            return Shape(arr)
 
         arr = []
         arr.append(simple_add_below(self, shape_1))
+        arr.extend(Shape.merge_add_below(self, shape_1))
 
         for i in range(1, len(self.arr[0])):  # loop thru the number of columns
             arr.append(simple_add_below(self, shape_1.empty_fill(i, True)))
+            arr.extend(Shape.merge_add_below(self, shape_1.empty_fill(i, True)))
 
         for i in range(1, len(shape_1.arr[0])):  # loop thru the number of columns
             arr.append(simple_add_below(self.empty_fill(i, True), shape_1))
-
-        # TODO add below needn't be exactly the row below, row can be merged if the shapes fit in
-
-        """
-        eg 
-        1 0 0
-        1 0 0
-        1 0 0
-        
-        ++++++++
-        0 1 1
-        1 0 0
-        1 0 0
-        
-        could be 
-        
-        1 0 0
-        1 0 0
-        1 1 1
-        1 0 0
-        1 0 0
-        
-        """
+            arr.extend(Shape.merge_add_below(self.empty_fill(i, True), shape_1))
 
         return arr
 
     def add_above(self, shape_1: "Shape"):
-        pass
+        return shape_1.add_below(self)
 
     def add_left(self, shape_1: "Shape"):
         pass

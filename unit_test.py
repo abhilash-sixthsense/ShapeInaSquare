@@ -100,13 +100,6 @@ class TestShape(unittest.TestCase):
             self.are_matrices_equal(shapes[3].arr, [[0, 0, 1], [0, 0, 1], [1, 1, 1]])
         )
 
-    def test_add_below(self):
-        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
-        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
-        # print(s.add_below(s1))
-        # for shape in s.add_below(s1):
-        #     shape.print()
-
     def test_merge_add_below(self):
         s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
         s2 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
@@ -124,9 +117,34 @@ class TestShape(unittest.TestCase):
         self.assertEqual(2, len(shapes))
         s1.print()
         s2.print()
-        print("Merged results")
-        for s in shapes:
-            s.print()
+        # print("Merged results")
+        # for s in shapes:
+        #     s.print()
+
+        s1 = Shape([[1, 1, 1], [1], [1]], unique_fill_char=True)
+        s2 = Shape([[0, 1, 1, 1], [0, 1], [0, 1, 1, 1]], unique_fill_char=True)
+        shapes = Shape.merge_add_below(s1, s2)
+        self.assertEqual(2, len(shapes))
+        s1.print()
+        s2.print()
+        # print("Merged results")
+        # for s in shapes:
+        #     s.print()
+
+    def test_add_below(self):
+        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        for shape in s.add_below(s1):
+            shape.print()
+
+    def test_add_above(self):
+        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        for shape in s.add_above(s1):
+            shape.print()
+
+    def test_shape_instances(self):
+        print(f"Total number of shape instances are {Shape.instace_count}")
 
     # def test_upper(self):
     #     self.assertEqual("foo".upper(), "FOO")
