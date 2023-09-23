@@ -1,3 +1,7 @@
+from colorama import Fore, Style
+from typing import List
+
+
 class Shape:
     available_fill_chars = [i for i in range(1, 100)]
     empty_char = "0"
@@ -32,11 +36,12 @@ class Shape:
         #     f"Fill Char is {self.fill_char} , remaining fill chars {Shape.available_fill_chars}"
         # )
         convert_to_matrix()
-        for row in self.arr:
-            for i in range(0, len(row)):
-                if row[i] != self.empty_char:
-                    # print("freplaced")
-                    row[i] = self.fill_char
+        if unique_fill_char:
+            for row in self.arr:
+                for i in range(0, len(row)):
+                    if row[i] != self.empty_char:
+                        # print("freplaced")
+                        row[i] = self.fill_char
         # print(len(arr))
 
     def __str__(self) -> str:
@@ -58,8 +63,6 @@ class Shape:
         return s
 
     def print(self, prefix="\n"):
-        from colorama import Fore, Back, Style
-
         colors = [
             Fore.BLUE,
             Fore.CYAN,
@@ -79,6 +82,7 @@ class Shape:
                 msg += f" {col} "
             msg += "\n"
         print(msg)
+        print(Style.RESET_ALL)
 
     def size(self):
         return (len(self.arr), len(self.arr[0]))
@@ -163,6 +167,75 @@ class Shape:
         # Not the best way, use this till an optinmal solution is found
         for _ in range(0, 3):
             self.arr = list(zip(*self.arr[::-1]))
+
+    @staticmethod
+    def merge_add_below(s1: "Shape", s2: "Shape"):
+        """
+        Loop s1 from bottom to top
+        loop s2 from top to bottom
+        """
+        print("Incoming merge request for ")
+        s1.print()
+        s2.print()
+        arr1: List[List[int]] = s1.arr
+        arr2: List[List[int]] = s2.arr
+        len_1 = len(arr1)
+        len_2 = len(arr2)
+        min_row_count = len_1 if len_1 <= len_2 else len_2
+
+        merged_shapes = []
+        for i in range(min_row_count):
+            # check if mergable
+            is_mergable = True
+            for j in range(i + 1):
+                print(f"{len_1}, {j}")
+                row1 = arr1[(len_1 - 1) - j]  # start from the last row
+                row2 = arr2[j]
+                print(f"Row1 {row1}")
+                print(f"Row2 {row2}")
+                min_col_len = len(row1) if len(row1) <= len(row2) else len(row2)
+                for k in range(min_col_len):
+                    if row1[k] != s1.empty_char and row2[k] != s2.empty_char:
+                        is_mergable = False
+                        print(f"Breaking merge at row {i}")
+                        break
+                    else:
+                        print(f"No breaking merge")
+                if not is_mergable:
+                    break
+
+            if not is_mergable:
+                break
+
+            # if the code is here it means its mergable up to i rows
+            print(f"Mergable up to {i} rows")
+            cln_1 = s1.clone_arr()
+            cln_2 = s2.clone_arr()
+
+            for j in range(i + 1):
+                row1 = cln_1[(len_1 - 1) - j]
+                row2 = cln_2[j]
+                min_col_len = len(row1) if len(row1) <= len(row2) else len(row2)
+                for k in range(min_col_len):
+                    if row1[k] == s1.empty_char and row2[k] != s2.empty_char:
+                        row1[k] = row2[k]
+                        print(f"Replaced at index {j}{k}")
+                    elif (row1[k] != s1.empty_char and row2[k] == s2.empty_char) or (
+                        row1[k] == s1.empty_char and row2[k] == s2.empty_char
+                    ):
+                        pass  # retain the value
+                    else:
+                        print("Wrong condition")
+                        raise Exception("Wrong condition in the logic")
+
+            for k in range(i, len(cln_2)):
+                row = cln_2[k]
+                cln_1.append(row)
+            merged_shapes.append(Shape(cln_1))
+
+        return merged_shapes
+
+        # merge the mergable rows
 
     @add_history
     def add_below(self, shape_1: "Shape"):
