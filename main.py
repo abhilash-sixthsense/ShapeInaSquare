@@ -163,13 +163,25 @@ class Shape:
 
     @add_history
     def rotate_right(self):
-        self.arr = list(zip(*self.arr[::-1]))
+        arr = self.clone_arr()
+        # Reverse each row to perform a right rotation
+        rotated_matrix = [list(reversed(row)) for row in arr]
+
+        # Use zip to transpose the rotated matrix (swap rows and columns again)
+        transposed = list(zip(*rotated_matrix))
+        return Shape(transposed)
 
     @add_history
     def rotate_left(self):
         # Not the best way, use this till an optinmal solution is found
-        for _ in range(0, 3):
-            self.arr = list(zip(*self.arr[::-1]))
+        arr = self.clone_arr()
+        # Use zip to transpose the matrix (swap rows and columns)
+        transposed = list(zip(*arr))
+
+        # Reverse each row to perform a left rotation
+        rotated_matrix = [list(reversed(row)) for row in transposed]
+
+        return Shape(rotated_matrix)
 
     @staticmethod
     def merge_add_below(s1: "Shape", s2: "Shape"):
@@ -245,6 +257,10 @@ class Shape:
 
     @add_history
     def add_below(self, shape_1: "Shape"):
+        """
+        Add the argument shape below the current shape
+        """
+
         def simple_add_below(s1: "Shape", s2: "Shape"):
             arr = s1.clone_arr()
             for row in s2.arr:
@@ -268,8 +284,16 @@ class Shape:
     def add_above(self, shape_1: "Shape"):
         return shape_1.add_below(self)
 
-    def add_left(self, shape_1: "Shape"):
-        pass
+    def add_left(self, shape: "Shape"):
+        s1_left_rotated = self.rotate_left()
+        s1_left_rotated.print()
+        print(s1_left_rotated.arr)
+        s2_left_rotated = shape.rotate_left()
+        s2_left_rotated.print()
+
+        shapes = s1_left_rotated.add_above(s2_left_rotated)
+        final_shapes = [s.rotate_right() for s in shapes]
+        return final_shapes
 
     def add_right(self, shape_1: "Shape"):
         pass

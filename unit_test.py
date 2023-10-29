@@ -132,15 +132,26 @@ class TestShape(unittest.TestCase):
         #     s.print()
 
     def test_add_below(self):
-        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
-        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
-        for shape in s.add_below(s1):
+        # s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        # s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        # for shape in s.add_below(s1):
+        #     shape.print()
+
+        s2 = Shape([[0, 0, 1], [0, 0, 1], [1, 1, 1]], unique_fill_char=True)
+        s3 = Shape([[0, 0, 1], [0, 0, 1], [1, 1, 1]], unique_fill_char=True)
+        for shape in s2.add_below(s3):
             shape.print()
 
     def test_add_above(self):
         s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
         s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
         for shape in s.add_above(s1):
+            shape.print()
+
+    def test_add_left(self):
+        s = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        s1 = Shape([[1], [1], [1, 1, 1]], unique_fill_char=True)
+        for shape in s.add_left(s1):
             shape.print()
 
     def test_shape_instances(self):
