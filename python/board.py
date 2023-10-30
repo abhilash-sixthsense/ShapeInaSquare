@@ -11,6 +11,9 @@ class Board:
 
     solved_shapes = []
 
+    def __add_to_solved_shape(self, shape):
+        self.solved_shapes.append(shape.clone())
+
     def __init__(self, shapes, size: tuple[int, int]):
         self.shapes = shapes
         self.size = size
@@ -33,7 +36,7 @@ class Board:
             ],
         ]
 
-        shapes = [Shape(s, unique_fill_char=True) for s in arr]
+        shapes = [Shape(s) for s in arr]
         return shapes
 
     def is_solved(self, shape: Shape) -> bool:
@@ -53,7 +56,7 @@ class Board:
         print("There are no empty slots in the shape")
         return True
 
-    def __is_error(self, shape: Shape):
+    def is_invalid(self, shape: Shape):
         shape_size = shape.size()
         return shape_size[0] > self.size[0] or shape_size[1] > self.size[1]
 
@@ -64,52 +67,20 @@ class Board:
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
         print(f"Inside __try_combinations shape {shape} , list : {remaining_shapes_list}")
 
-        if len(remaining_shapes_list) == 1:
-            # Just try combinations and no need to procced further
-            shape_1 = remaining_shapes_list[0]
-
-            shape.add_above(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-
-            shape.add_below(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-
-            shape.add_left(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-
-            shape.add_right(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-        else:
-            shape_1 = remaining_shapes_list[0]
-
-            shape.add_above(shape_1)
-            if not self.__is_error(shape):
-                self.__try_combinations(shape, remaining_shapes_list[1:])
-
-            shape.revert()
-
-            shape.add_below(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-
-            shape.add_left(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
-
-            shape.add_right(shape_1)
-            if self.is_solved(shape):
-                self.solved_shapes.append(shape.clone_arr())
-            shape.revert()
+        # Just try combinations and no need to procced further
+        shape_1 = remaining_shapes_list[0]
+        shapes = []
+        shapes.extend(shape.add_above(shape_1))
+        shapes.extend(shape.add_below(shape_1))
+        shapes.extend(shape.add_left(shape_1))
+        shapes.extend(shape.add_right(shape_1))
+        # TODO consider flips also
+        for s in shapes:
+            if self.is_solved(s):
+                self.__add_to_solved_shape(s)
+                print(f"Adding shape to solved shapes {s.__str__()}")
+            elif not self.is_invalid(s):
+                self.__try_combinations(s, self.shapes[1:])
 
     def solve(self):
         self.__try_combinations(self.shapes[0], self.shapes[1:])

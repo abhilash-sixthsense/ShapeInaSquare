@@ -1,50 +1,49 @@
 from typing import List
 
-from colorama import Fore, Style
+from colorama import Fore, Style, Back
 
 from exception import ShapeException
 
 
 class Shape:
     instance_count = 0
-    available_fill_chars = list(range(1, 100))
+    available_fill_chars = list(range(2, 100))
     empty_char = 0
     history = []
     arr = []
+    unique_fill_char = True
+    fill_char = -1
 
-    def __init__(self, arr, empty_char=0, unique_fill_char=False):
+    def __init__(self, arr):
         def convert_to_matrix():
             # Clone a new copy to avoid giving an array reference outside.
-            new_arr = [row[:] for row in arr]
+            new_arr = [r[:] for r in arr]
             max_cols = 0
-            for row in new_arr:
-                if len(row) > max_cols:
-                    max_cols = len(row)
+            for r in new_arr:
+                if len(r) > max_cols:
+                    max_cols = len(r)
 
             # print(f"Matrix size is {len(new_arr)},{max_cols}")
 
-            for row in new_arr:
-                for _ in range(0, max_cols - len(row)):
-                    row.append(self.empty_char)
+            for r in new_arr:
+                for _ in range(0, max_cols - len(r)):
+                    r.append(self.empty_char)
             self.arr = new_arr
 
         if not arr:
             raise ShapeException("Passed array couldn't be null or empty")
-        self.empty_char = empty_char
-        if unique_fill_char:
-            self.fill_char = Shape.available_fill_chars.pop(0)
-        else:
-            self.instance_count = 1
 
         # print(
         #     f"Fill Char is {self.fill_char} , remaining fill chars {Shape.available_fill_chars}"
         # )
         convert_to_matrix()
-        if unique_fill_char:
+        if Shape.unique_fill_char:
             for row in self.arr:
                 for i, _ in enumerate(row):
-                    if row[i] != self.empty_char:
-                        # print("freplaced")
+                    if row[i] == 1:
+                        # print("replaced")
+                        if self.fill_char == -1:
+                            self.fill_char = Shape.available_fill_chars.pop(0)
                         row[i] = self.fill_char
         # print(len(arr))
         Shape.instance_count += 1
@@ -68,30 +67,44 @@ class Shape:
         return s
 
     def print(self, prefix="\n"):
-        colors = [
-            Fore.BLACK,
-            Fore.BLUE,
-            Fore.CYAN,
-            Fore.GREEN,
-            Fore.LIGHTBLUE_EX,
-            Fore.LIGHTGREEN_EX,
-            Fore.LIGHTMAGENTA_EX,
-            Fore.LIGHTRED_EX,
-            Fore.LIGHTRED_EX,
+        # fg_colors = [
+        #     Fore.BLACK,
+        #     Fore.BLUE,
+        #     Fore.CYAN,
+        #     Fore.GREEN,
+        #     Fore.LIGHTBLUE_EX,
+        #     Fore.LIGHTGREEN_EX,
+        #     Fore.LIGHTMAGENTA_EX,
+        #     Fore.LIGHTRED_EX,
+        #     Fore.LIGHTRED_EX,
+        # ]
+        bg_colors = [
+            Back.BLACK,
+            Back.BLUE,
+            Back.CYAN,
+            Back.GREEN,
+            Back.LIGHTBLUE_EX,
+            Back.LIGHTGREEN_EX,
+            Back.LIGHTMAGENTA_EX,
+            Back.LIGHTRED_EX,
+            Back.LIGHTRED_EX,
         ]
         print(prefix)
         msg = ""
 
         for row in self.arr:
             for col in row:
-                msg += colors[col % 8]
-                msg += f" {col:3} "
+                # msg += fg_colors[col % 7]
+                msg += Fore.BLACK
+                msg += bg_colors[col % 8]
+                msg += f" {col:2} "
+                msg += Style.RESET_ALL
             msg += "\n"
         print(msg)
         print(Style.RESET_ALL)
 
     def size(self):
-        return (len(self.arr), len(self.arr[0]))
+        return len(self.arr), len(self.arr[0])
 
     def clone_arr(self):
         return [row[:] for row in self.arr]
@@ -124,31 +137,32 @@ class Shape:
             Shape(hvf_arr),
         ]
 
+    @staticmethod
+    def rotate_matrix_90_clockwise(matrix):
+        if not matrix:
+            return []
+
+        num_rows, num_cols = len(matrix), len(matrix[0])
+        rotated_matrix = [[0] * num_rows for _ in range(num_cols)]
+
+        for i in range(num_rows):
+            for j in range(num_cols):
+                rotated_matrix[j][num_rows - i - 1] = matrix[i][j]
+
+        return rotated_matrix
+
     def rotations(self):
-        def rotate_matrix_90_clockwise(matrix):
-            if not matrix:
-                return []
-
-            num_rows, num_cols = len(matrix), len(matrix[0])
-            rotated_matrix = [[0] * num_rows for _ in range(num_cols)]
-
-            for i in range(num_rows):
-                for j in range(num_cols):
-                    rotated_matrix[j][num_rows - i - 1] = matrix[i][j]
-
-            return rotated_matrix
-
         # All 90 degree rotations, total 4
         arr = self.clone_arr()
-        arr_90 = rotate_matrix_90_clockwise(arr)
-        arr_180 = rotate_matrix_90_clockwise(arr_90)
-        arr_270 = rotate_matrix_90_clockwise(arr_180)
+        arr_90 = self.rotate_matrix_90_clockwise(arr)
+        arr_180 = self.rotate_matrix_90_clockwise(arr_90)
+        arr_270 = self.rotate_matrix_90_clockwise(arr_180)
         return [Shape(arr), Shape(arr_90), Shape(arr_180), Shape(arr_270)]
 
     @staticmethod
     def add_history(f):
         def decorator(*args, **kwargs):
-            print(args)
+            # print(args)
             self = args[0]
             new_arr = [row[:] for row in self.arr]
             self.history.append(new_arr)
@@ -158,33 +172,25 @@ class Shape:
 
     def revert(self):
         if self.history:
-            print("Before Pop", self.history)
+            # print("Before Pop", self.history)
             self.arr = self.history.pop()
-            print("After Pop", self.history)
+            # print("After Pop", self.history)
             return True
         return False
 
     @add_history
     def rotate_right(self):
-        arr = self.clone_arr()
-        # Reverse each row to perform a right rotation
-        rotated_matrix = [list(reversed(row)) for row in arr]
-
-        # Use zip to transpose the rotated matrix (swap rows and columns again)
-        transposed = list(zip(*rotated_matrix))
-        return Shape(transposed)
+        return Shape(self.rotate_matrix_90_clockwise(self.arr))
 
     @add_history
     def rotate_left(self):
-        # Not the best way, use this till an optinmal solution is found
+        # Rotate right side 3 times
         arr = self.clone_arr()
         # Use zip to transpose the matrix (swap rows and columns)
-        transposed = list(zip(*arr))
-
-        # Reverse each row to perform a left rotation
-        rotated_matrix = [list(reversed(row)) for row in transposed]
-
-        return Shape(rotated_matrix)
+        arr_90 = self.rotate_matrix_90_clockwise(arr)
+        arr_180 = self.rotate_matrix_90_clockwise(arr_90)
+        arr_270 = self.rotate_matrix_90_clockwise(arr_180)
+        return Shape(arr_270)
 
     @staticmethod
     def merge_add_below(s1: "Shape", s2: "Shape"):
@@ -192,9 +198,9 @@ class Shape:
         Loop s1 from bottom to top
         loop s2 from top to bottom
         """
-        print("Incoming merge request for ")
-        s1.print()
-        s2.print()
+        # print("Incoming merge request for ")
+        # s1.print()
+        # s2.print()
         arr1: List[List[int]] = s1.arr
         arr2: List[List[int]] = s2.arr
         len_1 = len(arr1)
@@ -206,19 +212,20 @@ class Shape:
             # check if mergeable
             is_mergeable = True
             for j in range(i + 1):
-                print(f"{len_1}, {j}")
+                # print(f"{len_1}, {j}")
                 row1 = arr1[(len_1 - 1) - j]  # start from the last row
                 row2 = arr2[j]
-                print(f"Row1 {row1}")
-                print(f"Row2 {row2}")
+                # print(f"Row1 {row1}")
+                # print(f"Row2 {row2}")
                 min_col_len = len(row1) if len(row1) <= len(row2) else len(row2)
                 for k in range(min_col_len):
                     if row1[k] != s1.empty_char and row2[k] != s2.empty_char:
                         is_mergeable = False
-                        print(f"Breaking merge at row {i}")
-                        break
+                        # print(f"Breaking merge at row {i}")
+                        # break
                     else:
-                        print("No breaking merge")
+                        pass
+                        # print("No breaking merge")
                 if not is_mergeable:
                     break
 
@@ -226,7 +233,7 @@ class Shape:
                 break
 
             # if the code is here it means its mergeable up to i rows
-            print(f"mergeable up to {i} rows")
+            # print(f"mergeable up to {i} rows")
             cln_1 = s1.clone_arr()
             cln_2 = s2.clone_arr()
 
@@ -237,15 +244,15 @@ class Shape:
                 for k in range(min_col_len):
                     if row1[k] == s1.empty_char and row2[k] != s2.empty_char:
                         row1[k] = row2[k]
-                        print(f"Replaced at index {j}{k}")
+                        # print(f"Replaced at index {j}{k}")
                     elif (row1[k] != s1.empty_char and row2[k] == s2.empty_char) or (
                         row1[k] == s1.empty_char and row2[k] == s2.empty_char
                     ):
                         pass  # retain the value
                     else:
-                        print("Wrong condition")
+                        # print("Wrong condition")
                         raise ShapeException("Wrong condition in the logic")
-                # if the second array has larger number of colums , append the remaining ones
+                # if the second array has larger number of columns , append the remaining ones
                 for k in range(min_col_len, len(row2)):
                     row1.append(row2[k])
 
@@ -256,7 +263,16 @@ class Shape:
 
         return merged_shapes
 
-        # merge the mergable rows
+        # merge the mergeable rows
+
+    def shift_combinations(self, shape_1: "Shape") -> list[tuple["Shape", "Shape"]]:
+        combinations = []
+        for i in range(1, len(self.arr[0])):  # loop through the number of columns
+            combinations.append((self, shape_1.empty_fill(i, True)))
+        for i in range(1, len(shape_1.arr[0])):  # loop through the number of columns
+            combinations.append((self.empty_fill(i, True), shape_1))
+
+        return combinations
 
     @add_history
     def add_below(self, shape_1: "Shape"):
@@ -264,47 +280,41 @@ class Shape:
         Add the argument shape below the current shape
         """
 
-        def simple_add_below(s1: "Shape", s2: "Shape"):
-            arr = s1.clone_arr()
+        def simple_add_below(s1: "Shape", s2: "Shape") -> Shape:
+            cln_arr = s1.clone_arr()
             for row in s2.arr:
-                arr.append(row)
-            return Shape(arr)
+                cln_arr.append(row)
+            return Shape(cln_arr)
 
-        arr = []
-        arr.append(simple_add_below(self, shape_1))
+        arr = [simple_add_below(self, shape_1)]
         arr.extend(Shape.merge_add_below(self, shape_1))
 
-        for i in range(1, len(self.arr[0])):  # loop thru the number of columns
-            arr.append(simple_add_below(self, shape_1.empty_fill(i, True)))
-            arr.extend(Shape.merge_add_below(self, shape_1.empty_fill(i, True)))
-
-        for i in range(1, len(shape_1.arr[0])):  # loop thru the number of columns
-            arr.append(simple_add_below(self.empty_fill(i, True), shape_1))
-            arr.extend(Shape.merge_add_below(self.empty_fill(i, True), shape_1))
-
+        shift_combinations = self.shift_combinations(shape_1)
+        for combination in shift_combinations:
+            arr.append(simple_add_below(combination[0], combination[1]))
+            arr.extend(Shape.merge_add_below(combination[0], combination[1]))
         return arr
 
-    def add_above(self, shape_1: "Shape"):
+    def add_above(self, shape_1: "Shape") -> List:
         return shape_1.add_below(self)
 
-    def add_left(self, shape: "Shape"):
+    def add_left(self, shape: "Shape") -> List:
         s1_left_rotated = self.rotate_left()
-        s1_left_rotated.print()
-        print(s1_left_rotated.arr)
+        # s1_left_rotated.print()
         s2_left_rotated = shape.rotate_left()
-        s2_left_rotated.print()
+        # s2_left_rotated.print()
 
-        shapes = s1_left_rotated.add_above(s2_left_rotated)
+        shapes = s1_left_rotated.add_below(s2_left_rotated)
         final_shapes = [s.rotate_right() for s in shapes]
         return final_shapes
 
-    def add_right(self, shape_1: "Shape"):
-        pass
+    def add_right(self, shape_1: "Shape") -> List:
+        return shape_1.add_left(self)
 
     def empty_slot_exits(self):
         for row in self.arr:
             for val in row:
                 if val == self.empty_char:
-                    print(f"Empty char found at row {row} , so shape is not solved")
+                    # print(f"Empty char found at row {row} , so shape is not solved")
                     return True
         return False
