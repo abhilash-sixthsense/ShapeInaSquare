@@ -54,8 +54,74 @@ class TestBoard(unittest.TestCase):
         )
         self.assertTrue(board.is_solved(shape), msg="Board should be solved with the given shape")
 
-    def test_solve(self):
+    def test_solve_3_3(self):
         board = Board.create3_3_board()
+        board.solve()
+
+    def test_solve_8_8(self):
+        arr = [
+            [
+                [1],
+                [1, 1],
+                [1],
+                [1],
+            ],
+            [
+                [1],
+                [1, 1, 1],
+                [0, 1, 0],
+            ],
+            [
+                [1, 0, 1],
+                [1, 1, 1],
+            ],
+            [
+                [1, 1, 1],
+                [0, 1, 0],
+                [0, 1, 0],
+            ],
+            [
+                [1],
+                [1, 1],
+                [1, 1],
+            ],
+            [
+                [0, 1, 0],
+                [1, 1, 1],
+                [0, 1, 0],
+            ],
+            [
+                [1],
+                [1],
+                [1, 1],
+                [0, 1],
+            ],
+            [
+                [1],
+                [1, 1, 1, 1],
+            ],
+            [[1, 1, 1, 1]],
+            [
+                [1, 1, 1],
+                [0, 0, 1],
+                [0, 0, 1],
+            ],
+            [
+                [0, 0, 1],
+                [0, 1, 1],
+                [1, 1, 0],
+            ],
+            [
+                [1, 0, 0],
+                [1, 1, 1],
+                [0, 0, 1],
+            ],
+            [
+                [1, 1],
+                [1, 1],
+            ],
+        ]
+        board = Board([Shape(a) for a in arr], (8, 8))
         board.solve()
 
     if __name__ == "__main__":

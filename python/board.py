@@ -9,6 +9,8 @@ class Board:
 
     solved_shapes: list[Shape] = []
 
+    tried_combination_count = 0
+
     def __add_to_solved_shape(self, shape):
         for rs in shape.rotations():
             for ss in self.solved_shapes:
@@ -73,7 +75,11 @@ class Board:
         pass
 
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
-        # print(f"Inside __try_combinations shape \n{shape} , list : {remaining_shapes_list}")
+        # print(f"Inside __try_combinations shape , list size: {len(remaining_shapes_list)}")
+        # shape.print()
+        self.tried_combination_count += 1
+        if self.tried_combination_count % 100 == 0:
+            print(f"{self.tried_combination_count} combinations tried.....")
 
         # Just try combinations and no need to proceed further
         shape_1 = remaining_shapes_list[0]
