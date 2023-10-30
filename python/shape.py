@@ -48,6 +48,12 @@ class Shape:
         # print(len(arr))
         Shape.instance_count += 1
 
+    def __eq__(self, other):
+        """Overrides the default implementation"""
+        if isinstance(other, Shape):
+            return self.arr == other.arr
+        return False
+
     def __str__(self) -> str:
         msg = ""
         for row in self.arr:
@@ -89,7 +95,7 @@ class Shape:
             Back.LIGHTRED_EX,
             Back.LIGHTRED_EX,
         ]
-        print(prefix)
+        # print(prefix)
         msg = ""
 
         for row in self.arr:
@@ -101,7 +107,7 @@ class Shape:
                 msg += Style.RESET_ALL
             msg += "\n"
         print(msg)
-        print(Style.RESET_ALL)
+        # print(Style.RESET_ALL)
 
     def size(self):
         return len(self.arr), len(self.arr[0])
