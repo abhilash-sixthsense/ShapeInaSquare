@@ -178,8 +178,8 @@ class Shape:
         def decorator(*args, **kwargs):
             # print(args)
             self = args[0]
-            new_arr = [row[:] for row in self.arr]
-            self.history.append(new_arr)
+            # new_arr = [row[:] for row in self.arr]
+            # self.history.append(new_arr)
             return f(*args, **kwargs)
 
         return decorator
