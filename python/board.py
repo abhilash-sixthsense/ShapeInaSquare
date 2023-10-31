@@ -78,11 +78,8 @@ class Board:
         # print(f"Inside __try_combinations shape , list size: {len(remaining_shapes_list)}")
         # shape.print()
         self.tried_combination_count += 1
-        if self.tried_combination_count % 100 == 0:
-            print(f"{self.tried_combination_count} combinations tried.....")
-            print(f"Total shapes created {Shape.instance_count} , active {len(Shape.active_instance_ids)}")
-
-
+        if self.tried_combination_count % 300 == 0:
+            print(f"Combinations: {self.tried_combination_count:<8} Total Shapes: {Shape.instance_count:<15} Active Shapes {len(Shape.active_instance_ids):<10}")
             # Just try combinations and no need to proceed further
         shape_1 = remaining_shapes_list[0]
         shapes = []
@@ -97,10 +94,16 @@ class Board:
             if self.is_solved(s):
                 self.__add_to_solved_shape(s)
                 # print(f"Adding shape to solved shapes \n{s.__str__()}")
-            elif not self.is_invalid(s) and len(remaining_shapes_list) > 1:
+            if not self.is_invalid(s) and len(remaining_shapes_list) > 1:
                 self.__try_combinations(s, remaining_shapes_list[1:])
+            else:
+                # print("Can't proceed further with this shape , returning" )
+                # s.print()
+                # input("Press Enter to continue...")
+                pass
 
     def solve(self):
+        print("Solver running .....")
         self.__try_combinations(self.shapes[0], self.shapes[1:])
         if self.solved_shapes:
             print(f"There are {len(self.solved_shapes)} solved combinations")
