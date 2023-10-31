@@ -137,7 +137,8 @@ class Board:
                 tried_combinations_length = sum(len(row) for row in self.tried_combinations.values())
                 print(
                     f"Combinations: {self.tried_combination_count:<8} Total Shapes: {Shape.instance_count:<8} Active "
-                    f"Shapes {len(Shape.active_instance_ids):<8} Already Tried Combinations {tried_combinations_length:<10}"
+                    f"Shapes {len(Shape.active_instance_ids):<8} "
+                    f"Already Tried Combinations {tried_combinations_length:<10}"
                     f" solved: {len(self.solved_shapes)}"
                 )
 
