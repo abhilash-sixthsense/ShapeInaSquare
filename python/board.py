@@ -80,8 +80,10 @@ class Board:
         self.tried_combination_count += 1
         if self.tried_combination_count % 100 == 0:
             print(f"{self.tried_combination_count} combinations tried.....")
+            print(f"Total shapes created {Shape.instance_count} , active {len(Shape.active_instance_ids)}")
 
-        # Just try combinations and no need to proceed further
+
+            # Just try combinations and no need to proceed further
         shape_1 = remaining_shapes_list[0]
         shapes = []
         sr = shape_1.rotations()

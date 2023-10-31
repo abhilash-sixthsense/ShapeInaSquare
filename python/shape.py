@@ -14,6 +14,8 @@ class Shape:
     unique_fill_char = True
     fill_char = -1
 
+    instance_id = -1
+    active_instance_ids = set()
     def __init__(self, arr):
         def convert_to_matrix():
             # Clone a new copy to avoid giving an array reference outside.
@@ -47,6 +49,12 @@ class Shape:
                         row[i] = self.fill_char
         # print(len(arr))
         Shape.instance_count += 1
+        self.instance_id = Shape.instance_count
+        Shape.active_instance_ids.add(self.instance_id)
+
+    def __del__(self):
+        # print(f'Destructing instance {self.instance_id}')
+        Shape.active_instance_ids.remove(self.instance_id)
 
     def __eq__(self, other):
         """Overrides the default implementation"""
