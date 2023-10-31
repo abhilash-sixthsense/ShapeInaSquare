@@ -121,7 +121,8 @@ class Board:
         # Just try combinations and no need to proceed further
         shape_1 = remaining_shapes_list[0]
         shapes = []
-        sr = shape_1.rotations()
+        # sr = shape_1.rotations()
+        sr = [shape_1]
         for s in sr:
             shapes.extend(shape.add_above(s))
             shapes.extend(shape.add_below(s))
@@ -130,7 +131,7 @@ class Board:
         # TODO consider flips also
         for s in shapes:
             self.tried_combination_count += 1
-            if self.tried_combination_count % 1000 == 0:
+            if self.tried_combination_count % 50000 == 0:
                 # for k, v in self.tried_combinations.items():
                 #     print(k, len(v))
                 tried_combinations_length = sum(len(row) for row in self.tried_combinations.values())
@@ -139,12 +140,13 @@ class Board:
                     f"Shapes {len(Shape.active_instance_ids):<8} Already Tried Combinations {tried_combinations_length:<10}"
                     f" solved: {len(self.solved_shapes)}"
                 )
-            if self.check_tried_combination(s):
-                # print("Already tried combination")
-                continue
+
             if self.is_solved(s):
                 self.__add_to_solved_shape(s)
             if not self.is_invalid(s) and len(remaining_shapes_list) > 1:
+                if self.check_tried_combination(s):
+                    # print("Already tried combination")
+                    continue
                 self.__try_combinations(s, remaining_shapes_list[1:])
             else:
                 # print("Can't proceed further with this shape , returning")
