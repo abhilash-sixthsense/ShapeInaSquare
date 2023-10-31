@@ -254,6 +254,14 @@ class TestShape(unittest.TestCase):
 
         b = [[1, 1, 1, 1], [2, 2, 2, 2], [3, 3, 3, 3], [4, 4, 4, 4]]
 
+    def test_dump_to_file(self):
+        s = Shape([[1]])
+        file_path = s.dump_to_file()
+        s1 = Shape.load_from_file(file_path)
+        print(type(s1))
+        print(Shape.active_instance_ids)
+        s1.print()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -58,6 +58,10 @@ class TestBoard(unittest.TestCase):
         board = Board.create3_3_board()
         board.solve()
 
+    def test_solve_3_3_1(self):
+        board = Board.create3_3_board_1()
+        board.solve()
+
     def test_solve_8_8(self):
         arr = [
             [

@@ -1,3 +1,5 @@
+import os
+import pickle
 from typing import List
 
 from colorama import Fore, Style, Back
@@ -16,6 +18,7 @@ class Shape:
 
     instance_id = -1
     active_instance_ids = set()
+
     def __init__(self, arr):
         def convert_to_matrix():
             # Clone a new copy to avoid giving an array reference outside.
@@ -54,7 +57,9 @@ class Shape:
 
     def __del__(self):
         # print(f'Destructing instance {self.instance_id}')
-        Shape.active_instance_ids.remove(self.instance_id)
+        # Double check because when loaded from file, there may be multiple shapes instances with same instance id
+        if self.instance_id in Shape.active_instance_ids:
+            Shape.active_instance_ids.remove(self.instance_id)
 
     def __eq__(self, other):
         """Overrides the default implementation"""
@@ -125,6 +130,19 @@ class Shape:
 
     def clone(self):
         return Shape(self.clone_arr())
+
+    def dump_to_file(self, folder_path="./solved shapes"):
+        file_path = f"{folder_path}/{self.instance_id}.shape"
+        with open(f"{file_path}", "wb") as f:
+            if not os.path.exists(folder_path):
+                os.makedirs(folder_path)
+            pickle.dump(self, f)
+        return file_path
+
+    @staticmethod
+    def load_from_file(file_path):
+        with open(file_path, "rb") as f:
+            return pickle.load(f)
 
     def flips(self):
         # Vertical, horizontal, vertical-horizontal filips
