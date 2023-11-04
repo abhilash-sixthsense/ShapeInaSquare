@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 
 from decorators import measure_time, print_measure_time
 from shape import Shape
@@ -20,6 +21,7 @@ class Board:
     tried_combinations = set()
     tried_combination_hit_count = 0
     tried_combinations_bk_up_file = "tried_combination_machine_generated.txt"
+    start_time = datetime.now()
 
     @measure_time
     def check_tried_combination(self, s: Shape):
@@ -210,17 +212,20 @@ class Board:
         #     print(k, len(v))
         tried_combinations_length = len(self.tried_combinations)
         print(
-            f"Combinations: {self.tried_combination_count:<8,} "
-            f"Already Tried Combinations {tried_combinations_length:<10,}"
-            f"Hit tried Combinations count {self.tried_combination_hit_count:<10,}"
+            f"Combinations: {self.tried_combination_count:<15,} "
+            # f"Already Tried Combinations {tried_combinations_length:<10,}"
+            # f"Hit tried Combinations count {self.tried_combination_hit_count:<10,}"
             f" solved: {len(self.solved_shapes)}"
         )
         print_measure_time()
-        print("===" * 40, "\n")
-
+        elapsed_time = datetime.now() - self.start_time
+        hours, remainder = divmod(elapsed_time.total_seconds(), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        print(f"Running for {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}")
         if is_stop_flag_on():
             self.__save_state()
             sys.exit()
+        print("===" * 40, "\n")
 
     @measure_time
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
