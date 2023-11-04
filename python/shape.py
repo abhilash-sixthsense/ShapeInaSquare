@@ -4,6 +4,7 @@ from typing import List
 
 from colorama import Fore, Style, Back
 
+from decorators import measure_time
 from exception import ShapeException
 
 
@@ -144,6 +145,7 @@ class Shape:
         with open(file_path, "rb") as f:
             return pickle.load(f)
 
+    @measure_time
     def flips(self):
         # Vertical, horizontal, vertical-horizontal filips
         def horizontal_flip_matrix(matrix):
@@ -170,6 +172,7 @@ class Shape:
         ]
 
     @staticmethod
+    @measure_time
     def rotate_matrix_90_clockwise(matrix):
         if not matrix:
             return []
@@ -183,6 +186,7 @@ class Shape:
 
         return rotated_matrix
 
+    @measure_time
     def rotations(self):
         # All 90 degree rotations, total 4
         arr = self.clone_arr()
@@ -215,6 +219,7 @@ class Shape:
         return Shape(self.rotate_matrix_90_clockwise(self.arr))
 
     @add_history
+    @measure_time
     def rotate_left(self):
         # Rotate right side 3 times
         arr = self.clone_arr()
@@ -225,6 +230,7 @@ class Shape:
         return Shape(arr_270)
 
     @staticmethod
+    @measure_time
     def merge_add_below(s1: "Shape", s2: "Shape"):
         """
         Loop s1 from bottom to top
@@ -297,6 +303,7 @@ class Shape:
 
         # merge the mergeable rows
 
+    @measure_time
     def shift_combinations(self, shape_1: "Shape") -> list[tuple["Shape", "Shape"]]:
         combinations = []
         for i in range(1, len(self.arr[0])):  # loop through the number of columns
@@ -307,6 +314,7 @@ class Shape:
         return combinations
 
     @add_history
+    @measure_time
     def add_below(self, shape_1: "Shape"):
         """
         Add the argument shape below the current shape
@@ -330,6 +338,7 @@ class Shape:
     def add_above(self, shape_1: "Shape") -> List:
         return shape_1.add_below(self)
 
+    @measure_time
     def add_left(self, shape: "Shape") -> List:
         s1_left_rotated = self.rotate_left()
         # s1_left_rotated.print()
@@ -343,6 +352,7 @@ class Shape:
     def add_right(self, shape_1: "Shape") -> List:
         return shape_1.add_left(self)
 
+    @measure_time
     def empty_slot_exits(self):
         for row in self.arr:
             for val in row:

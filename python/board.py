@@ -1,4 +1,9 @@
+import os
+import sys
+
+from decorators import measure_time, print_measure_time
 from shape import Shape
+from utils import is_stop_flag_on, get_file_size_in_gb
 
 
 class Board:
@@ -12,25 +17,19 @@ class Board:
     tried_combination_count = 0
 
     # key will be the number of zeros and value will be the arr
-    tried_combinations = dict()
+    tried_combinations = set()
 
+    tried_combinations_bk_up_file = "tried_combination_machine_generated.txt"
+
+    @measure_time
     def check_tried_combination(self, s: Shape):
-        a = s.arr
-        zero_count = 0
-        for row in a:
-            zero_count += len(row)
-        if zero_count in self.tried_combinations:
-            combo = self.tried_combinations[zero_count]
-        else:
-            combo = []
-            self.tried_combinations[zero_count] = combo
-
-        if s.arr in combo:
+        t = tuple(tuple(inner_list) for inner_list in s.arr)
+        if t in self.tried_combinations:
             return True
         else:
-            combo.append(s.arr)
-            return False
+            self.tried_combinations.add(t)
 
+    @measure_time
     def __add_to_solved_shape(self, shape):
         for rs in shape.rotations():
             for ss in self.solved_shapes:
@@ -42,17 +41,97 @@ class Board:
         self.solved_shapes.append(shape)
         shape.dump_to_file()
 
+    def __save_state(self):
+        def __save_tried_combinations():
+            print(f"Saving Tried combinations {len(self.tried_combinations)} combinations")
+            print(f"Tried combinations count {self.tried_combination_count}")
+            with open("tried_combination_count_machine_generated.txt", "a") as f:
+                f.write(str(self.tried_combination_count) + "\n")
+            # Create a set with tuples of tuples
+            my_set = self.tried_combinations
+
+            # Convert the set to a list (if needed)
+            my_list = list(my_set)
+
+            # Define the file name
+
+            tmp_file_name = "tmp_" + self.tried_combinations_bk_up_file
+            # Open the file in write mode
+            with open(tmp_file_name, "w") as file:
+                for item in my_list:
+                    for sub_tuple in item:
+                        file.write(str(sub_tuple) + "\n")
+                    file.write("\n")  # Add a newline between each tuple of tuples
+
+            print("Saved Tried combinations")
+            if os.path.exists(self.tried_combinations_bk_up_file):
+                print("Existing back up found")
+                size_existing = get_file_size_in_gb(self.tried_combinations_bk_up_file)
+                size_new = get_file_size_in_gb(tmp_file_name)
+                if size_existing < size_new:
+                    # replace old with new
+                    print("Replacing old back up with new")
+                    os.remove(self.tried_combinations_bk_up_file)
+                    os.rename(tmp_file_name, self.tried_combinations_bk_up_file)
+                    print(f"Replaced old backup with new one , {size_new} GB")
+                else:
+                    print("Old back up is bigger than new, so skipping backup , removing new file ")
+                    os.remove(tmp_file_name)
+
+        __save_tried_combinations()
+
+    def __load_state(self):
+        def __load_tried_combinations():
+            # Initialize an empty set
+            loaded_set = set()
+
+            # Open the file in read mode
+            if os.path.exists(self.tried_combinations_bk_up_file):
+                # Initialize an empty set
+                loaded_set = set()
+                file_size_gb = get_file_size_in_gb(self.tried_combinations_bk_up_file)
+                print(f"Loading the already calculated combinations ,file size {file_size_gb} GB")
+                # Open the file in read mode
+                with open(self.tried_combinations_bk_up_file, "r") as file:
+                    current_tuple = set()
+                    lines = file.readlines()
+                    for line in lines:
+                        line = line.strip()  # Remove leading/trailing whitespace and newline characters
+                        if line:
+                            line = line.replace("(", "").replace(")", "")
+                            current_tuple.add(tuple(map(int, line.split(","))))
+                        else:
+                            if current_tuple:
+                                loaded_set.add(tuple(current_tuple))
+                                current_tuple = set()
+
+                # Print the loaded set
+                print("Loaded tried combinations")
+                # print(loaded_set)
+            else:
+                print(f"Cannot load tried combinations, file {self.tried_combinations_bk_up_file} doesn't exist")
+            # Print the loaded set
+
+            self.tried_combinations = loaded_set
+
+        __load_tried_combinations()
+
+    def __print_board_summary(self):
+        print("-------------- Shapes --------------")
+        for s in self.shapes:
+            s.print()
+        print(f"-------------- Total {len(self.shapes)} Shapes --------------")
+
     def __init__(self, shapes, size: tuple[int, int]):
         self.shapes = shapes
         self.size = size
         print(f"Creating board of size {size}")
-        print("-------------- Shapes --------------")
-        for s in shapes:
-            s.print()
-        print(f"-------------- Total {len(self.shapes)} Shapes --------------")
+        # self.__print_board_summary()
+        self.__load_state()
 
     @staticmethod
     # Returns a 3*3 solvable shapes
+    @measure_time
     def create3_3_board() -> "Board":
         arr = [
             [
@@ -73,6 +152,7 @@ class Board:
         return board
 
     @staticmethod
+    @measure_time
     def create3_3_board_1() -> "Board":
         arr = [
             [
@@ -89,6 +169,7 @@ class Board:
         board = Board(shapes, (3, 3))
         return board
 
+    @measure_time
     def is_solved(self, shape: Shape) -> bool:
         # write the check solved logic
         # check the size of the shape is equal to the size of the board
@@ -106,14 +187,17 @@ class Board:
         # print("There are no empty slots in the shape")
         return True
 
+    @measure_time
     def is_invalid(self, shape: Shape):
         shape_size = shape.size()
         return shape_size[0] > self.size[0] or shape_size[1] > self.size[1]
 
     @staticmethod
+    @measure_time
     def __horizontal_flip(arr):
         pass
 
+    @measure_time
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
         # print(f"Inside __try_combinations shape , list size: {len(remaining_shapes_list)}")
         # shape.print()
@@ -130,15 +214,21 @@ class Board:
         # TODO consider flips also
         for s in shapes:
             self.tried_combination_count += 1
-            if self.tried_combination_count % 1000 == 0:
+            if self.tried_combination_count % 100000 == 0:
                 # for k, v in self.tried_combinations.items():
                 #     print(k, len(v))
-                tried_combinations_length = sum(len(row) for row in self.tried_combinations.values())
+                tried_combinations_length = len(self.tried_combinations)
                 print(
-                    f"Combinations: {self.tried_combination_count:<8} Total Shapes: {Shape.instance_count:<8} Active "
-                    f"Shapes {len(Shape.active_instance_ids):<8} Already Tried Combinations {tried_combinations_length:<10}"
+                    f"Combinations: {self.tried_combination_count:<8,} Already Tried Combinations {tried_combinations_length:<10,}"
                     f" solved: {len(self.solved_shapes)}"
                 )
+                print_measure_time()
+                print("===" * 40, "\n")
+
+                if is_stop_flag_on():
+                    self.__save_state()
+                    sys.exit()
+
             if self.check_tried_combination(s):
                 # print("Already tried combination")
                 continue
@@ -152,9 +242,14 @@ class Board:
                 # input("Press Enter to continue...")
                 pass
 
+    @measure_time
     def solve(self):
         print("Solver running .....")
-        self.__try_combinations(self.shapes[0], self.shapes[1:])
+        try:
+            self.__try_combinations(self.shapes[0], self.shapes[1:])
+        except KeyboardInterrupt:
+            print("\nForced stop detected. Exiting gracefully.")
+            self.__save_state()
         if self.solved_shapes:
             print(f"There are {len(self.solved_shapes)} solved combinations")
             for index, s in enumerate(self.solved_shapes):
