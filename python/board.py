@@ -18,16 +18,17 @@ class Board:
 
     # key will be the number of zeros and value will be the arr
     tried_combinations = set()
-
+    tried_combination_hit_count = 0
     tried_combinations_bk_up_file = "tried_combination_machine_generated.txt"
 
     @measure_time
     def check_tried_combination(self, s: Shape):
-        t = tuple(tuple(inner_list) for inner_list in s.arr)
-        if t in self.tried_combinations:
-            return True
-        else:
-            self.tried_combinations.add(t)
+        return False
+        # t = tuple(tuple(inner_list) for inner_list in s.arr)
+        # if t in self.tried_combinations:
+        #     return True
+        # else:
+        #     self.tried_combinations.add(t)
 
     @measure_time
     def __add_to_solved_shape(self, shape):
@@ -77,6 +78,8 @@ class Board:
                 else:
                     print("Old back up is bigger than new, so skipping backup , removing new file ")
                     os.remove(tmp_file_name)
+            else:
+                os.rename(tmp_file_name, self.tried_combinations_bk_up_file)
 
         __save_tried_combinations()
 
@@ -98,8 +101,13 @@ class Board:
                     for line in lines:
                         line = line.strip()  # Remove leading/trailing whitespace and newline characters
                         if line:
+                            org_line = line
                             line = line.replace("(", "").replace(")", "")
-                            current_tuple.add(tuple(map(int, line.split(","))))
+                            try:
+                                current_tuple.add(tuple(map(int, line.split(","))))
+                            except Exception as e:
+                                print(line)
+                                print(e)
                         else:
                             if current_tuple:
                                 loaded_set.add(tuple(current_tuple))
@@ -197,6 +205,23 @@ class Board:
     def __horizontal_flip(arr):
         pass
 
+    def __print_progress_info(self):
+        # for k, v in self.tried_combinations.items():
+        #     print(k, len(v))
+        tried_combinations_length = len(self.tried_combinations)
+        print(
+            f"Combinations: {self.tried_combination_count:<8,} "
+            f"Already Tried Combinations {tried_combinations_length:<10,}"
+            f"Hit tried Combinations count {self.tried_combination_hit_count:<10,}"
+            f" solved: {len(self.solved_shapes)}"
+        )
+        print_measure_time()
+        print("===" * 40, "\n")
+
+        if is_stop_flag_on():
+            self.__save_state()
+            sys.exit()
+
     @measure_time
     def __try_combinations(self, shape: Shape, remaining_shapes_list):
         # print(f"Inside __try_combinations shape , list size: {len(remaining_shapes_list)}")
@@ -215,22 +240,11 @@ class Board:
         for s in shapes:
             self.tried_combination_count += 1
             if self.tried_combination_count % 100000 == 0:
-                # for k, v in self.tried_combinations.items():
-                #     print(k, len(v))
-                tried_combinations_length = len(self.tried_combinations)
-                print(
-                    f"Combinations: {self.tried_combination_count:<8,} Already Tried Combinations {tried_combinations_length:<10,}"
-                    f" solved: {len(self.solved_shapes)}"
-                )
-                print_measure_time()
-                print("===" * 40, "\n")
-
-                if is_stop_flag_on():
-                    self.__save_state()
-                    sys.exit()
+                self.__print_progress_info()
 
             if self.check_tried_combination(s):
                 # print("Already tried combination")
+                self.tried_combination_hit_count += 1
                 continue
             if self.is_solved(s):
                 self.__add_to_solved_shape(s)

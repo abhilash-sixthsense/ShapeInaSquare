@@ -27,7 +27,7 @@ def measure_time(func):
 def print_measure_time():
     # Print the execution times
     sorted_data = sorted(execution_times.items(), key=lambda item: item[1][0])
-    for function_name, execution_time in sorted_data:
+    for function_name, execution_time in sorted_data[-4:]:
         print(
             f"{function_name:<35} took {execution_time[0]:.2f} seconds to run , total {execution_time[1]} times,"
             + f" average {execution_time[0]/execution_time[1]:.4f} seconds, last run {execution_time[2]:.4f} seconds"
